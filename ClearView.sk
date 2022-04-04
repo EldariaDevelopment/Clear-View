@@ -1,0 +1,47 @@
+#Author Almond
+#Version 1.0
+Vars:
+  {Blocks} = redstone ore or gold ore or water or lava or obsidian or lapis lazuli ore or iron ore or coal ore or emerald ore
+command /ServerSettings [<text>]:
+	trigger:
+		if player has permission "ServerSettings.Edit.*":
+			if args 1 is not set:
+				open chest with 3 rows named "&0[ Server Settings ]" to player
+				format slot 13 of player with a nametag named "&8[ &7Server Name &8]" with lore "&7%{ServerName}%" to run [make player execute command "/ServerSettings ChangeName"]
+    if {xray} is true:
+      format slot 15 of player with green wool to run [make player execute command "/ServerSettings XrayOff"]
+    if {xray} is not set:
+      format slot 15 of player with red wool to run [make player execute command "/ServerSettings XrayOn"]
+			if args 1 is "ChangeName":
+				close the player's inventory
+				send " " to player
+				send "&7&oEnter your server's name into chat." to player
+				set {ChatEdit.%player%} to "ChangeName"
+      if args 1 is "XrayOn":
+        delete {xray}
+        send "&7[%{ServerName}%&7]: Xray, Off" to player
+      if args 1 is "XrayOff":
+        Set {xray} to true
+        send "&7[%{ServerName}%&7]: Xray, On" to player
+on chat:
+  if {ChatEdit.%player%} is set:
+    cancel event
+    if {ChatEdit.%player%} is "ChangeName":
+      set {ServerName} to message
+      delete {ChatEdit.%player%}
+      send " " to player
+      send "&7Server name has been updated. Server is now named ""&f%{ServerName}%""&7." to player
+      send " " to player
+
+on mine:
+  {xray} is true
+  wait 1 tick:
+    if player's y coordinate is less or equal to 0:
+      loop blocks in radius 10 of player:
+          if loop-block is diamond ore or emerald ore or :
+            if block 1 meter above loop-block-1 is not air or {Blocks}:
+              if block 1 meter below loop-block-1 is not air or {Blocks}:
+                if block 1 meter east loop-block-1 is not air or {Blocks}:
+                  if block 1 meter west of loop-block-1 is not air or {Blocks}:
+                    loop block 1 meter west of loop-block-1 as loop-block-2
+                    make player see loop-block-1 as loop-block-2
